@@ -1,0 +1,38 @@
+:START
+    superprint "This program will list all the ASCII characters. Have fun!"
+    superprint "=========================================================="
+    line
+    push -1
+    :blammo
+        add 1
+        iprint
+        print ":"
+        pop
+        print " "
+        pop
+        print
+        print " "
+        print "/"
+        print
+        pop
+        print
+        pop
+        add -255
+        nzsk
+            doop
+        add 255
+    goto blammo
+
+    ~superprint
+        nesk
+        return
+        :superloop
+            print
+            pop
+        nebr superloop
+        line
+        return
+
+    ~doop
+        line
+        end

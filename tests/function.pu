@@ -1,0 +1,187 @@
+## MAIN
+:start
+    print_al "Hello, world!"
+    print_al "What's up? I love you, world."
+    push 3
+    iprint
+    print_a " times 2 to the power of "
+    push 5
+    iprint
+    print_a " is "
+    power2
+    iprint
+    print_al "."
+    clear
+    push 7, 6
+    iprint
+    print_a " times "
+    give
+    iprint
+    print_a " is "
+    take
+    mul
+    iprint
+    print_al "."
+    clear
+    push 25, 6, 73, 12, 3, 4, 21
+    stack
+    print_al "   |-REVERSED-|"
+    reverse 5
+    stack
+end
+
+
+## This function moves the second-from-top value of the main stack N places down, where N
+## is the number on top of the stack.
+~sink
+    add 1
+    dup
+    give
+    swap
+    :sink loop
+        give
+        add -1
+        zbr sink 2
+        swap
+        take
+        swap
+        take
+        swap
+        give
+        give
+    goto sink loop
+    :sink 2
+        pop
+        take
+        take
+        :sink loop 2
+            add -1
+            zbr sink end
+            take
+            swap
+        goto sink loop 2
+    :sink end
+        pop
+return
+
+## This function uses the SINK function to reverse the next N numbers on the stack, where N
+## is the number on top of the stack. N is not included in the reversal, and is discarded.
+~reverse
+    :reverse loop
+        dup
+        give
+        add -1
+        SINK
+        take
+        add -1
+        zsk
+    goto reverse loop
+    pop
+return
+
+## This function prints out the current stack until it reaches 0, which is discarded.
+~print_tz
+    :print_tz loop
+        print
+        pop
+    nzbr print_tz loop
+    pop
+return
+
+## This function does the same thing as print_tz, but outputs a new line at the end.
+~print_tzl
+    print_tz
+    line
+return
+
+## This function writes X characters, where X is the number on top of the stack.
+~print_c
+    :print_c loop
+        zbr print_c done
+        add -1
+        give
+        print
+        pop
+        take
+    goto print_c loop
+    :print_c done
+        pop
+return
+
+## This function writes the number of characters given by the number of arguments.
+## (i.e. it works like a normal print command)
+~print_a
+    argc
+    print_c
+return
+
+## This function does the same thing as print_a, but outputs a new line at the end.
+~print_al
+    print_a
+    line
+return
+
+## This function prints each stack entry until the stack is empty.
+~print_ws
+    :print_ws loop
+        print
+        pop
+    nebr print_ws loop
+return
+
+## This function does the same thing as print_ws, but outputs a new line at the end.
+~print_wsl
+    print_ws
+    line
+return
+
+## This function calculates the number second from the top of the stack,
+## times 2 to the power of the number on top of the stack.
+~power2
+    :power2 loop
+# first, multiply by 2
+        swap
+        dup
+        add
+# then, count how many times we've done that
+        swap
+        add -1
+# if we're not done, go back to the beginning
+    nzbr power2 loop
+# otherwise take the zero off the stack
+    pop
+return
+
+## This function multiplies the two numbers on top of the stack.
+~mul
+# backup for safekeeping
+    give
+    dup
+    :mul loop
+# check if complete
+        take
+        add -1
+        zbr mul done
+# if not...
+        give
+# add original number to total
+        dup
+        give
+        add
+        take
+    goto mul loop
+    :mul done
+# get rid of extra values
+        swap
+        pop
+        pop
+return
+
+## This function clears the stack.
+~clear
+    :clear loop
+# "esk" so the program doesn't explode if you run ~clear on an empty stack
+        esk
+        pop
+    nebr clear loop
+return

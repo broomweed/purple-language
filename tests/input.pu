@@ -1,0 +1,42 @@
+:the beginning
+:start
+    print_ws ">> "
+    input
+# save the first character for later
+    dup
+    give
+# print out the whole stack + newline
+    push "you said: `"
+    print_ws
+    print_ws "`, which was "
+    inpc
+    iprint
+    pop
+    print_wsl " characters long."
+# bring back first character and check whether it's q
+    take
+    push "q"
+    neg
+    add
+# if it is
+    zbr the end
+    pop
+# if not start over
+    goto the beginning
+    :the end
+end
+
+
+## This function prints each stack entry until the stack is empty.
+~print_ws
+    :print_ws loop
+        print
+        pop
+    nebr print_ws loop
+return
+
+## This function does the same thing as print_ws, but outputs a new line at the end.
+~print_wsl
+    print_ws
+    line
+return

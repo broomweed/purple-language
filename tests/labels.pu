@@ -1,0 +1,26 @@
+:labels are fun, aren't they?
+    print "5"
+    pop
+    add -1
+nzbr labels are fun, aren't they?
+
+    line
+goto goto statement considered harmful
+
+:end
+    end
+
+:start
+    push 5
+    goto labels are fun, aren't they?
+
+:goto statement considered harmful
+    pop
+    push 7
+    :wow this is fun
+        zbr end
+        print "A"
+        line
+        pop
+        add -1
+    goto wow this is fun

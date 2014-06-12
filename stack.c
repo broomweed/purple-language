@@ -17,7 +17,12 @@ void stack_init (stackT *stackP, char *name) {
 }
 
 void stack_destroy (stackT *stackP) {
-    free(stackP->top);
+    stackNodeT* node = stackP->top;
+    while (node) {
+        stackNodeT* nextNode = node->next;
+        free(node);
+        node = nextNode;
+    }
     stackP->top = NULL;
 }
 
@@ -37,9 +42,11 @@ int stack_pop (stackT *stackP) {
         fprintf(stderr, "%s is empty.\n", stackP->name);
         exit(1);
     }
+    stackNodeT* oldTop = stackP->top;
 
     int retVal = stackP->top->value;
     stackP->top = stackP->top->next;
+    free(oldTop);
     return retVal;
 }
 

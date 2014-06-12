@@ -19,12 +19,14 @@ void quit();
 char *str_trim (char*);
 int str_prefix (char*, char*);
 int str_parseint (char*, int*);
+char *str_dup (char*);
 label labels[1024];
 label functions[1024];
 
 int labelnum = 0;
 int functionnum = 0;
 char input[1024];
+char *readLine;
 
 int i;
 int argcount = 0;
@@ -59,26 +61,27 @@ int main (int argc, char **argv) {
 
     int line = 1;
     int startspecial = 0;
-    char *command = (char*)malloc(1024);
 
-    while (fgets(command, 1024, fp)) {
-        command = str_trim(command);
-        if (command[0] == ':') {
-            for (i=0; command[i]; i++) command[i] = tolower(command[i]);
-            command[i] = '\0';
+    readLine = malloc(1024*sizeof(char));
+
+    while (fgets(readLine, 1024, fp)) {
+        readLine = str_trim(readLine);
+        if (readLine[0] == ':') {
+            for (i=0; readLine[i]; i++) readLine[i] = tolower(readLine[i]);
+            readLine[i] = '\0';
             labels[labelnum].location = ftell(fp);
-            labels[labelnum].name = malloc(sizeof(char)*(strlen(command)));
-            strncpy(labels[labelnum].name, command+1, strlen(command));
+            labels[labelnum].name = malloc(sizeof(char)*(strlen(readLine)));
+            strncpy(labels[labelnum].name, readLine+1, strlen(readLine));
             labels[labelnum].name = str_trim(labels[labelnum].name);
             if (!strcmp(labels[labelnum].name, "start")) startspecial = 1;
             labelnum++;
         }
-        if (command[0] == '~') {
-            for (i=0; command[i]; i++) command[i] = tolower(command[i]);
-            command[i] = '\0';
+        if (readLine[0] == '~') {
+            for (i=0; readLine[i]; i++) readLine[i] = tolower(readLine[i]);
+            readLine[i] = '\0';
             functions[functionnum].location = ftell(fp);
-            functions[functionnum].name = malloc(sizeof(char)*(strlen(command)));
-            strcpy(functions[functionnum].name, command+1);
+            functions[functionnum].name = malloc(sizeof(char)*(strlen(readLine)));
+            strcpy(functions[functionnum].name, readLine+1);
             functions[functionnum].name = str_trim(functions[functionnum].name);
             functionnum++;
         }
@@ -90,13 +93,14 @@ int main (int argc, char **argv) {
 
     if (startspecial) parse_label("start", 0);
 
-    while (fgets(command, 1000, fp)) {
-        parse_line(command, line);
+    while (fgets(readLine, 1000, fp)) {
+        parse_line(readLine, line);
         line++;
     }
 
     printf("\nReached end without finding `END`!\n");
-    free(command);
+
+    free(readLine);
 
     quit();
 }
@@ -115,13 +119,18 @@ void parse_line (char *line, int linenum) {
     command[i] = '\0';
     for (i=0; command[i]; i++) command[i] = tolower(command[i]);
 
-    if(str_prefix(command, ":") || str_prefix(command, "~")) return;
+    if(str_prefix(command, ":") || str_prefix(command, "~")) {
+        free(command);
+        return;
+    }
 
-    temp = &line[strlen(command)];
+    temp = str_dup(&line[strlen(command)]);
     temp = str_trim(temp);
 
     if(!strcmp(command, "goto")) {
         parse_label(temp, linenum);
+        free(temp);
+        free(command);
         return;
     }
 
@@ -129,6 +138,8 @@ void parse_line (char *line, int linenum) {
         if(!stack_peek(&stack)) {
             parse_label(temp, linenum);
         }
+        free(temp);
+        free(command);
         return;
     }
 
@@ -136,6 +147,8 @@ void parse_line (char *line, int linenum) {
         if(stack_peek(&stack)) {
             parse_label(temp, linenum);
         }
+        free(temp);
+        free(command);
         return;
     }
 
@@ -143,6 +156,8 @@ void parse_line (char *line, int linenum) {
         if (stack_empty(&stack)) {
             parse_label(temp, linenum);
         }
+        free(temp);
+        free(command);
         return;
     }
 
@@ -150,6 +165,8 @@ void parse_line (char *line, int linenum) {
         if (!stack_empty(&stack)) {
             parse_label(temp, linenum);
         }
+        free(temp);
+        free(command);
         return;
     }
 
@@ -190,6 +207,8 @@ void parse_line (char *line, int linenum) {
 
     if (stringmode) {
         fprintf(stderr, "\nunclosed quote at line %d", linenum);
+        free(temp);
+        free(command);
         return;
     } else {
         numstring[numindex] = '\0';
@@ -215,6 +234,7 @@ void parse_line (char *line, int linenum) {
     parse_command(command, linenum);
 
     free(command);
+    free(temp);
 }
 
 void parse_command (char *command, int linenum) {
@@ -230,6 +250,7 @@ void parse_command (char *command, int linenum) {
         for (i=0; i < functionnum; i++) {
             if (!strcmp(functions[i].name, command)) {
                 parse_function(i, linenum);
+                free(temp);
                 return;
             }
         }
@@ -238,9 +259,9 @@ void parse_command (char *command, int linenum) {
         } else if (strcmp(temp, "pop") == 0) {
             stack_pop(&stack);
         } else if (!strcmp(temp, "dup")) {
-            stackElementT temp = stack_pop(&stack);
-            stack_push(&stack, temp);
-            stack_push(&stack, temp);
+            stackElementT tempElement = stack_pop(&stack);
+            stack_push(&stack, tempElement);
+            stack_push(&stack, tempElement);
         } else if (strcmp(temp, "add") == 0) {
             stack_push(&stack, stack_pop(&stack) + stack_pop(&stack));
         } else if (!strcmp(temp, "push")) {
@@ -333,8 +354,19 @@ void quit() {
     /* ok OS you can have your memory back now */
     fclose(fp);
 
+    for (i = 0; i < labelnum; i++) {
+        free(labels[i].name);
+    }
+
+    for (i = 0; i < functionnum; i++) {
+        free(functions[i].name);
+    }
+
     stack_destroy(&stack);
+    stack_destroy(&auxstack);
     stack_destroy(&callstack);
+
+    free(readLine);
 
     exit(0);
 }
@@ -374,4 +406,12 @@ int str_parseint(char *string, int *i) {
 
     *i = (int)l;
     return 1;
+}
+
+char *str_dup (char *str) {
+    char *newstr = malloc ((strlen(str)+1) * sizeof(char));
+    if (newstr) {
+        strcpy(newstr, str);
+    }
+    return newstr;
 }

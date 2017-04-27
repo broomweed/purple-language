@@ -46,6 +46,9 @@ print       Prints the ASCII value of the top number on the stack, without poppi
 iprint      Prints the numerical value of the top number on the stack, without popping.
 line        Prints a newline, ASCII value 10. Equivalent to writing "print 10" followed
                 by "pop."
+rand        Replaces the top value on the stack with a random integer between 0 and
+                the number currently onto the top of the stack.
+stack       For debugging purposes, prints out a representation of the current stack.
 give        Pops the top value off the main stack and pushes it onto the auxiliary stack.
 take        Pops the top value off the auxiliary stack and pushes it onto the main stack.
 end         Ends the program. Letting the program run off the end of the file without

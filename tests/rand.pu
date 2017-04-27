@@ -1,0 +1,23 @@
+### This program prints out random letters until "q" is typed.
+### (tbh it's mostly dealing with the "q" thing)
+:start
+:blah
+    :clear
+        esk
+        pop
+    nebr clear
+    push 94
+    rand
+    add 32
+    print
+    pop
+    input
+    inpc
+    zbr blah
+    pop
+    push "q"
+    neg
+    add
+    zsk
+    goto blah
+end

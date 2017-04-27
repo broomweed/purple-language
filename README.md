@@ -69,6 +69,10 @@ ebr         Branch to the specified label if the stack is empty.
 nebr        Branch to the specified label if the stack is NOT empty.
 zbr         Branch to the specified label if the number on top of the stack is zero.
 nzbr        Branch to the specified label if the number on top of the stack is NOT zero.
+esk         Skip the next command if the stack is empty.
+nesk        Skip the next command if the stack is NOT empty.
+zsk         Skip the next command if the number on top of the stack is zero.
+nzsk        Skip the next command if the number on top of the stack is NOT zero.
 ```
 When branching to a label name, do not use the colon preceding the name; i.e. the label denoted `:label` would be moved to by the command `goto label`, not `goto :label`. Unless your label name actually starts with a colon, but then it would be labeled `::label`. Why are you naming your labels like this in the first place, is the real question.
 

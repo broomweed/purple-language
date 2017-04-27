@@ -1,7 +1,7 @@
 Purple
 ======
 
-Purple (supposedly short for PURPoseless LanguagE) is a slightly esoteric, Turing-complete, stack-based programming language written in C. My C is not so great though (or at least it wasn't when I wrote this), so the current implementation leaks memory like a sieve. (I'm terrible at C but this is pretty egregious even for me -- I don't think it ever frees memory it allocates for strings.) I may or may not fix this at some point in the future.
+Purple (supposedly short for PURPoseless LanguagE) is a slightly esoteric, Turing-complete, stack-based programming language written in C. Well, this implementation is, at least. It could theoretically be written in something else.
 
 Syntax
 ------

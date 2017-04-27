@@ -139,39 +139,39 @@ return
 ## times 2 to the power of the number on top of the stack.
 ~power2
     :power2 loop
-# first, multiply by 2
+        # first, multiply by 2
         swap
         dup
         add
-# then, count how many times we've done that
+        # then, count how many times we've done that
         swap
         add -1
-# if we're not done, go back to the beginning
+    # if we're not done, go back to the beginning
     nzbr power2 loop
-# otherwise take the zero off the stack
+    # otherwise take the zero off the stack
     pop
 return
 
 ## This function multiplies the two numbers on top of the stack.
 ~mul
-# backup for safekeeping
+    # backup for safekeeping
     give
     dup
     :mul loop
-# check if complete
+        # check if complete
         take
         add -1
         zbr mul done
-# if not...
+        # if not...
         give
-# add original number to total
+        # add original number to total
         dup
         give
         add
         take
     goto mul loop
     :mul done
-# get rid of extra values
+        # get rid of extra values
         swap
         pop
         pop
@@ -180,7 +180,7 @@ return
 ## This function clears the stack.
 ~clear
     :clear loop
-# "esk" so the program doesn't explode if you run ~clear on an empty stack
+        # "esk" so the program doesn't explode if you run ~clear on an empty stack
         esk
         pop
     nebr clear loop

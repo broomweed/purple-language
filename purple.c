@@ -379,7 +379,7 @@ char *str_trim (char *string) {
     while (isspace (string[i]) && string[i] != '\0')
         i++;
 
-    while (isspace (string[j]) && j >= 0)
+    while (j >= 0 && isspace (string[j]))
         j--;
 
     while (i <= j)
